@@ -13,6 +13,7 @@ using namespace std;
 
 //1067
 //返回到0时的次数！=count，+1，else ;
+/*
 int in[100000];
 int main(int argc, char const *argv[])
 {
@@ -33,6 +34,7 @@ int main(int argc, char const *argv[])
 	cout<<count;
 	return 0;
 }
+*/
 //6-07
 /*const int INF = 999999999;
 int main(int argc, char const *argv[])
@@ -1603,7 +1605,6 @@ int main(int argc, char const *argv[])
 			}
 		}
 	}
-	//æŒ‡æ•°ä½å°äºŽæ•°å­—ä¸ªæ•?
 	system("pause");
 	return 0;
 }*/
@@ -1978,6 +1979,145 @@ int main(int argc, char const *argv[])
 			break;
 	}
 	printf("%.2lf", sum);
+	return 0;
+}
+*/
+//1026
+/*
+int main()
+{
+	int m,n;
+	cin>>m>>n;
+
+	int a = (int)((n-m)/100.0+0.5);
+	int b = a/60;
+	int c = b/60;
+	int d = a%60;
+	printf("%02d:%02d:%02d\n",c,b%60,d);
+	return 0;
+}*/
+//1028
+/*
+bool compare1(int preYear, int Year, int preMonth, int Month, int preDay, int Day)
+{
+	if(Year > preYear)
+		return true;
+	else if(Year == preYear){
+		if(Month > preMonth)
+			return true;
+		else if(Month == preMonth)
+			if(Day > preDay)
+				return true;
+	}
+	return false;
+}
+
+bool compare2(int preYear, int Year, int preMonth, int Month, int preDay, int Day)
+{
+	if(Year < preYear)
+		return true;
+	else if(Year == preYear){
+		if(Month < preMonth)
+			return true;
+		else if(Month == preMonth)
+			if(Day < preDay)
+				return true;
+	}
+	return false;
+}
+
+int main()
+{
+	int n;
+	cin >> n;
+	int maxYear = 2014, minYear = 1814;
+	int maxMonth = 9, minMonth = 9;
+	int maxDay = 7, minDay = 5;
+	string maxName = "", minName = "";
+	int validCount = 0;
+	while(n--){
+		string name;
+		cin>>name;
+		int year = 0,month = 0,day = 0;
+		scanf("%d/%d/%d",&year,&month,&day);
+		if(compare2(2014, year, 9, month, 7, day) && compare1(1814,year,9,month,5,day)){
+			validCount++;
+			if(compare2(maxYear,year,maxMonth,month,maxDay,day)){
+				maxYear = year;
+				maxMonth = month;
+				maxDay = day;
+				maxName = name;
+			}
+			if(compare1(minYear,year,minMonth,month,minDay,day)){
+				minYear = year;
+				minMonth = month;
+				minDay = day;
+				minName = name;
+			}
+		}
+	}
+	cout<<validCount;
+	if(maxName!="")
+		cout<<" "<<maxName;
+	if(minName!="")
+		cout<<" "<<minName<<endl;
+	return 0;
+}
+*/
+
+//1029
+/*
+int main()
+{
+	string str1;
+	string str2;
+	string::const_iterator it1, it2;
+	cin >> str1;
+	cin >> str2;
+	set<char> s;
+	for(it1 = str1.begin(),it2 = str2.begin(); it1 != str1.end() ; ++it1){
+		if(*it1 != *it2){
+			char c1 = toupper(*it1);
+			if(s.find(c1) == s.end()){
+				s.insert(c1);
+				cout<<c1;
+			}
+		}
+		else
+			it2++;
+	}
+	cout<<endl;
+	return 0;
+}
+*/
+
+//1031
+/*
+int main()
+{
+	int n;
+	cin >> n;
+	int weight[17] = {7,9,10,5,8,4,2,1,6,3,7,9,10,5,8,4,2};
+	char mCode[11] = {'1','0','X','9','8','7','6','5','4','3','2'};
+	string::const_iterator it;
+	bool flag = true;
+	while(n--){
+		string str;
+		cin>>str;
+		int sum = 0;
+		int i = 0;
+		for(it = str.begin(); it != str.end()-1; ++it){
+			int d = *it - '0';
+			sum += d*weight[i++];
+		}
+		if(mCode[sum%11] != (*it)){
+			cout<<str<<endl;
+			flag = false;
+		}
+	}
+	if(flag)
+		cout<<"All passed"<<endl;
+	
 	return 0;
 }
 */

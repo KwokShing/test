@@ -51,12 +51,12 @@ ywtit.bind('DOMSubtreeModified',function (){
 	var ywText= ywtit.text();
 	if(ywText.indexOf('丸')>0){
 		ywtit.unbind('DOMSubtreeModified');
-		$.dialog.tips_black("斗鱼自动抢鱼丸 监视开启成功 52pojie-Ghostz1ai");
+		$.dialog.tips_black("斗鱼自动抢鱼丸 监视开启成功");
 		//人数部分监视
 		setInterval(function (){
 			//人太少了
-			if($('#ol_num').text()<100000){
-				$.dialog.tips_black("人数少于10W准备跳转");
+			if($('#ol_num').text()<10000){
+				$.dialog.tips_black("人数少于1W准备跳转");
 				$.get('/directory/all?page=1&isAjax=1', function(data) {
 					var div = $('<div/>');
 					div.html(data);

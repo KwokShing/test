@@ -2121,3 +2121,593 @@ int main()
 	return 0;
 }
 */
+//1032
+/*
+int cmp(const pair<int, int> &a, const pair<int, int> &b)
+{
+	return a.second>b.second;
+}
+
+int main()
+{
+	map<int, int> mScore;
+	map<int, int>::const_iterator mit;
+	vector<pair<int, int> > vScore;
+	int n;
+	cin>>n;
+	while(n--){
+		int id, score;
+		cin>>id>>score;
+		
+		if(mScore.find(id) == mScore.end())
+			mScore[id] = score;
+		else
+			mScore[id] += score;
+			
+	}
+	for(mit = mScore.begin(); mit != mScore.end(); ++mit)
+		vScore.push_back(make_pair(mit->first,mit->second));
+	sort(vScore.begin(),vScore.end(),cmp);
+	cout<<vScore[0].first<<" "<<vScore[0].second<<endl;
+
+	return 0;
+}
+*/
+
+//1020
+/*
+void LevelOrderTraverse(TreeNode *root)
+{
+	queue<TreeNode *> q;
+	q.push(root);
+	while(!q.empty()) {
+		cout<<q.front()->val;
+		if(q.front()->left != NULL) {
+			q.push(q.front()->left);
+		}	
+		if(q.front()->right != NULL) {
+			q.push(q.front()->right);
+		}
+		q.pop();
+		if(!q.empty())
+			cout<<" ";
+	}	
+}
+int FindOffSet(int *inOrder, int target, int len)
+{
+	for(int i = 0; i < len; ++i)
+		if(target == inOrder[i])
+			return i;
+	return -1;
+}
+
+TreeNode *Construction(int *&postOrder, int *inOrder, int inOrderLen)
+{
+	TreeNode *root = new TreeNode(*postOrder);
+	if(inOrderLen == 1)
+		return root;
+	int offset = FindOffSet(inOrder, *postOrder, inOrderLen);
+	if(0 < offset && offset < inOrderLen - 1) {
+		root->right = Construction(++postOrder, inOrder + offset + 1, inOrderLen - offset -1);
+		root->left = Construction(++postOrder, inOrder, offset);
+	}
+	else if(0 == offset) {
+		root->right = Construction(++postOrder, inOrder + offset + 1, inOrderLen - offset -1);
+	}
+	else if(inOrderLen-1 == offset) {
+		root->left = Construction(++postOrder, inOrder, offset);
+	}
+	//root->right = Construction();
+	return root;
+}
+
+int main()
+{
+	//test
+	TreeNode root(1);
+	TreeNode n2(2);
+	TreeNode n3(3);
+	TreeNode n4(4);
+	root.left = &n2;	
+	root.right = &n3;
+	root.left->left = &n4;
+	LevelOrderTraverse(&root);
+	return 0;
+	int n;
+	int postOrder[30],inOrder[30];
+	cin>>n;
+	if(0==n)
+		return 0;
+	for(int i = n-1; i >= 0; --i) {
+		cin>>postOrder[i];
+	}
+	for(int i = 0; i < n; ++i) {
+		cin>>inOrder[i];	
+	}
+	int *tmp = postOrder;
+	int *&tmp2 = tmp;
+	TreeNode *root = Construction(tmp2,inOrder,n);
+	LevelOrderTraverse(root);
+	//cout<<"aaa"<<endl;
+	return 0;
+}
+*/
+
+//1004
+/*1003
+map<int, vector<int> > treeNode;
+int leafNodeCount[101] = {0};
+
+
+void DFS(int id, int level)
+{
+	if(treeNode[id].empty()) {
+		leafNodeCount[level]++;	
+		return;
+	}
+	for(vector<int>::const_iterator it = treeNode[id].begin(); it != treeNode[id].end(); ++it) {
+		DFS(*it, level+1);
+	}
+}
+
+int main()
+{
+	int n,m;
+	cin>>n>>m;
+	int total = n-m;
+	while(m--) {
+		int id,parentId, childId, childNum;
+		cin>>id>>childNum;
+		while(childNum--) {
+			cin>>childId;
+			treeNode[id].push_back(childId);
+		}
+	}
+	DFS(1,0);
+	int count = leafNodeCount[0];
+	cout<<leafNodeCount[0];
+	for(int i = 1; count < total; ++i ) {
+		cout<<" ";
+		count+=leafNodeCount[i];
+		cout<<leafNodeCount[i];
+	}
+	return 0;
+}
+*/
+
+//1004
+/*
+typedef struct
+{
+	int id;
+	int teams;
+} Node;
+
+Node nodeList[500];
+map<int, vector<pair<int, int> > > edgeMap;
+priority_queue<pair<int, int> > q;
+int dis[500] = {INT_MAX};
+int parent[500] = {-1};
+bool visit[500] = {false};
+int pathNum = 0;
+//int curTeam = 0;
+int maxTeam = 0;
+
+struct cmp{
+	bool operator() (const pair<int, int> &x, const pair<int, int> &y)
+	{
+		return x.second > y.second;
+	}
+};
+
+void DFS(int curId, int endId,int curDis, int curTeam)
+{
+	visit[curId] = true;
+	if(curId == endId) {
+		if(curDis == dis[endId]) {
+			pathNum++;
+			if(curTeam > maxTeam)
+				maxTeam = curTeam;
+		}
+		return;
+	}
+	if(curDis > dis[endId])
+		return;
+	vector<pair<int,int> >::const_iterator it;
+	vector<pair<int,int> > edge = edgeMap[curId];
+	for(it = edge.begin(); it != edge.end(); ++it) {
+		int newId = (*it).first;
+		int tmpDis = (*it).second;
+		if(dis[curId] + tmpDis == dis[newId])
+			DFS(newId,endId,curDis + tmpDis, curTeam+nodeList[newId].teams);
+	}
+}
+
+void Dijkstra()
+{
+	//priority_queue<int,vector<pair<int, int> >, cmp> q;
+	while(!q.empty()) {
+		int curNode = q.top().first;
+		int curDis = q.top().second;
+		q.pop();
+		vector<pair<int, int> > tmpVec = edgeMap[curNode];
+		for(vector<pair<int, int> >::const_iterator it = tmpVec.begin(); it != tmpVec.end(); ++it) {
+			int relax = dis[curNode] + (*it).second;
+			int nodeId = (*it).first;
+			if(dis[nodeId] > relax) {
+				dis[nodeId] = relax;
+				parent[nodeId] = curNode;
+				q.push(make_pair(nodeId,relax));
+			}
+		}
+	}	
+}
+
+int main()
+{
+	int nVertex, mEdges, startId, endId, teamsOnVertex;
+	cin>>nVertex>>mEdges>>startId>>endId;
+	dis[startId] = 0;
+	visit[startId] = true;
+	for(int i = 0; i < nVertex; ++i) {
+		cin>>teamsOnVertex;
+		nodeList[i].teams = teamsOnVertex;
+	}
+	for(int i = 0; i < mEdges; ++i) {
+		int v1,v2,distance;
+		cin>>v1>>v2>>distance;
+		if(v1 == startId) {
+			dis[v2] = distance;
+			q.push(make_pair(v2,distance));
+		}
+		else if(v2 == startId) {
+			dis[v1] = distance;
+			q.push(make_pair(v1,distance));
+		}
+		edgeMap[v1].push_back(make_pair(v2,distance));
+		edgeMap[v2].push_back(make_pair(v1,distance));
+	}
+	Dijkstra();
+	DFS(startId,endId,0,nodeList[startId].teams);
+	cout<<pathNum<<" "<<maxTeam<<endl;
+	return 0;
+}
+*/
+//1013
+/*
+int pre[1200] = {-1};
+int my_rank[1200] = {1};
+void Init()
+{
+	for(int i = 1; i < 1200; ++i) {
+		pre[i] = i;
+		my_rank[i] = 1;
+	}
+}
+
+int Find(int x)
+{
+	if(x != pre[x])
+		pre[x] = Find(pre[x]);
+	return pre[x];
+}
+
+void Union(int x, int y)
+{
+	int x_root = Find(x);
+	int y_root = Find(y);
+	if(my_rank[x_root] > my_rank[y_root])
+		pre[y_root] = x_root;
+	else {
+		pre[x_root] = y_root;
+		if(my_rank[x_root] == my_rank[y_root])
+			my_rank[y_root]++;
+	}
+}
+
+int main()
+{
+	int n, m, k;
+	int tmp;
+	vector<pair<int, int> > edges; 
+	cin>>n>>m>>k;
+	tmp = m;
+	while(m--) {
+		int a, b;
+		cin>>a>>b;
+		edges.push_back(make_pair(a,b));
+	}
+	while(k--) {
+		Init();
+		int check;
+		cin>>check;
+		vector<pair<int, int> >::const_iterator it;
+		int pre_root = -1;
+		int count = 0;
+		for(it = edges.begin(); it != edges.end(); ++it) {
+			int a = (*it).first;
+			int b = (*it).second;
+			if(a != check && b != check)
+				Union(a,b);
+		}
+		for(int i = 1; i <= n; ++i) {
+			if(pre[i] == i && i != check)
+				count++;
+		}
+		cout<<count-1<<endl;
+	}
+	return 0;
+}
+*/
+
+//1014
+/*
+int MAX_TIME = INT_MAX;
+bool cmp(const pair<int, int> & a, const pair<int, int> & b)
+{
+	if(a.second == b.second)
+		return a.first < b.first;
+	else
+		return a.second > b.second;
+}
+void MakeQueue(vector<list<pair<int, int> > > & lines, int mCapacity, int nWindows)
+{
+	list<pair<int, int> > tmp;
+	tmp.resize(0);
+	for(int i = 0; i < nWindows; ++i)
+		lines.push_back(tmp);
+}
+int main()
+{
+	int nWindows, mCapacity, kCustomers, query, kCustomers_cp;
+	int * time = new int[nWindows];
+	list<pair<int, int> > cus_trans;
+	vector<list<pair<int, int> > > lines;
+	cin>>nWindows>>mCapacity>>kCustomers>>query;
+	kCustomers_cp = kCustomers;
+	MakeQueue(lines,mCapacity,nWindows);
+	int cId = 0, wId = 0, running_time = 0;	
+	while(kCustomers--) {
+		int transtime;
+		cin>>transtime;
+		cus_trans.push_back(make_pair(cId++,transtime));
+	}
+	int count = 0;
+	bool flag = true;
+	while(flag) {
+		vector<list<pair<int, int> > >::iterator it;
+		int min_line = mCapacity;
+		int wId = 0, targetWin = 0;
+		bool full_flag = true;
+		for(it = lines.begin(); it != lines.end(); ++it,++wId) {
+			if((*it).size() < min_line) {
+				min_line = (*it).size();
+				targetWin = wId;
+				full_flag = false;
+			}
+		}
+		//cout<<"min_line: "<<min_line<<" wId: "<<targetWin<<endl;
+		//return 0;
+		if(full_flag == true) {
+			int min_time = MAX_TIME;
+			int target_id = 0;	
+			for(it = lines.begin(); it != lines.end(); ++it) {
+				pair<int, int> top_cus = (*it).front();
+				if(top_cus.second < min_time) {
+					min_time = top_cus.second;
+					target_id = top_cus.first;
+				}
+			}
+			running_time += min_time;
+			for(it = lines.begin(); it != lines.end(); ++it) {
+				pair<int, int> tmp = (*it).front();
+				tmp.second -= min_time;
+				(*it).pop_front();
+				(*it).push_front(tmp);
+				if(tmp.second == 0) { 
+					(*it).pop_front();
+					time[(*it).front().first] = running_time;
+					cout<<"id: "<<(*it).front().first<<"  running time: "<<running_time<<endl;
+					if(++count == kCustomers_cp) {
+						flag = false;
+						break;
+						cout<<"break"<<endl;
+					}
+				}
+			}
+		}
+		else {
+			if(!cus_trans.empty()) {
+				cout<<"cusId: "<<cus_trans.front().first<< "in line: "<<targetWin<<endl;
+				lines[targetWin].push_back(cus_trans.front());
+				cus_trans.pop_front();
+			}
+		}
+	}
+	
+	delete[] time;
+	return 0;
+}*/
+
+//1030
+/*
+int nCity;
+int max_dis = INT_MAX;
+int Distance[501] = {max_dis};
+int pre[501] = {-1};
+pair<int, int> m_map[501][501];
+
+struct cmp {
+	bool operator() (const pair<int, int> & x, const pair<int, int> & y)
+	{
+		return x.second > y.second;
+	}
+};
+
+priority_queue<pair<int, int>,vector<pair<int, int> >, cmp> q;
+void Dijkstra()
+{ 
+	while(!q.empty()) {
+		int minDisId = q.top().first;
+		int minDis = q.top().second;
+		q.pop();
+		for(int i = 0; i < nCity; ++i) {
+			pair<int, int> tmpPair = m_map[minDisId][i];
+			if(tmpPair.first != max_dis) {
+				int relax = Distance[minDisId] + (tmpPair.first << 10) + tmpPair.second;
+				if(Distance[i] > relax) {
+					Distance[i] = relax;
+					pre[i] = minDisId;
+					q.push(make_pair(i,relax));
+				}
+			}
+		}	
+	}
+
+}
+
+void clearPre()
+{	
+	for(int i = 0; i < nCity; ++i) {
+		pre[i] = i;	
+		for(int j = 0; j < nCity; ++j)
+			m_map[i][j].first = max_dis;
+		m_map[i][i] = make_pair(0,0);
+	}
+}
+
+int main()
+{
+	int mRoad, start,end;
+	int c1,c2,dis,cost;
+	cin>>nCity>>mRoad>>start>>end;
+	clearPre();
+	Distance[start] = 0;
+	while(mRoad--) {
+		cin>>c1>>c2>>dis>>cost;
+		if(c1 == start) {
+			pre[c2] = c1;
+			Distance[c2] = (dis<<10)+cost;	
+			q.push(make_pair(c2,(dis<<10)+cost));	
+		}
+		else if(c2 == start) {
+			pre[c1] = c2;
+			Distance[c1] = (dis<<10)+cost;
+			q.push(make_pair(c1,(dis<<10)+cost));	
+		}
+		m_map[c1][c2] = make_pair(dis,cost);
+		m_map[c2][c1] = make_pair(dis,cost);
+	}
+	Dijkstra();
+	int before = end;
+	int dis_sum = 0;
+	int cost_sum = 0;
+	stack<int> track;
+	track.push(end);
+	do {
+		dis_sum += m_map[before][pre[before]].first;
+		cost_sum += m_map[before][pre[before]].second;
+		before = pre[before];
+		track.push(before);
+	} while(before != pre[before]);
+	while(!track.empty()) {
+		cout<<track.top()<<" ";
+		track.pop();
+	}
+	cout<<dis_sum<<" "<<cost_sum<<endl;
+	return 0;
+}*/
+
+//1021
+/*
+#define N 10001
+int pre[N];
+int Rank[N] = {1};
+bool visit[N] = {false};
+map<int, vector<int> > edgesMap;
+
+void Clear()
+{
+	for(int i = 0; i < N; ++i)
+		pre[i] = i;
+}
+int FindRoot(int x)
+{
+	if(x != pre[x])
+		pre[x] = FindRoot(pre[x]);
+	return pre[x];
+}
+
+void UnionSet(int x, int y)
+{
+	int x_root = FindRoot(x);
+	int y_root = FindRoot(y);
+	if(Rank[x_root] > Rank[y_root])
+		pre[y_root] = x_root;
+	else {
+		pre[x_root] = y_root;
+		if(Rank[x_root] == Rank[y_root])
+			Rank[y]++;
+	}
+}
+
+void DFS(int curVertex, int level, int & height, set<int> & deepestVertex)
+{
+	visit[curVertex] = true;
+	if(level > height) {
+		height = level;
+		deepestVertex.clear();
+		deepestVertex.insert(curVertex);
+	} else if(level == height) {
+		deepestVertex.insert(curVertex);
+	}
+	vector<int>::const_iterator it;
+	vector<int> tmp = edgesMap[curVertex];
+	for(it = tmp.begin(); it != tmp.end(); ++it) {
+		if(false == visit[*it]) {
+			DFS(*it, level+1, height, deepestVertex);
+		}
+	}
+}
+
+int main()
+{
+	Clear();
+	int n,m;
+	cin>>n;
+	m = n;
+	while(--m) {
+		int x, y;
+		cin>>x>>y;
+		edgesMap[x].push_back(y);
+		edgesMap[y].push_back(x);
+		UnionSet(x,y);
+	}
+	int count = 0;
+	for(int i = 1; i <= n; ++i)
+		if(pre[i] == i)
+			count++;
+	if(count == 1) {
+		set<int>::const_iterator sit;
+		set<int> deepSet;
+		set<int> resSet;
+		int height = 0;
+		DFS(1,0,height,deepSet);
+		int root = *deepSet.begin();
+		for(sit = deepSet.begin(); sit != deepSet.end(); ++sit)
+			resSet.insert(*sit);
+		deepSet.clear();
+		height = 0;
+		memset(&visit, false, N);
+		DFS(root,0,height,deepSet);
+		for(sit = deepSet.begin(); sit != deepSet.end(); ++sit)
+			resSet.insert(*sit);
+		for(sit = resSet.begin(); sit != resSet.end(); ++sit)
+			cout<<*sit<<endl;
+	}
+	else if(count > 1) {
+		cout<<"Error: "<<count<<" components"<<endl;
+	}
+	return 0;
+}
+*/
